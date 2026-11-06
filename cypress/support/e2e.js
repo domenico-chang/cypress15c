@@ -29,17 +29,3 @@ if (!app.document.head.querySelector('[data-hide-command-log-request]')) {
 
   app.document.head.appendChild(style);
 }
-
-// Ignorar errores no capturados de React para evitar fallos de tests
-Cypress.on('uncaught:exception', (err, runnable) => {
-  // Ignorar errores de React y de la aplicación
-  if (
-    err.message.includes('Minified React error') ||
-    err.message.includes('HTML') ||
-    err.message.includes('Render')
-  ) {
-    return false; // No fallar el test
-  }
-  // Permitir que otros errores fallen el test
-  return true;
-});

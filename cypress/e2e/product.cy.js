@@ -1,77 +1,49 @@
-describe('Prueba 3: Registrar un producto', () => {
-  it('Debe capturar pantalla del formulario de producto', () => {
-    // Visitar la página
+describe('Registro y validación de productos', () => {
+  it('debe registrar un producto con datos válidos y categoría seleccionada', () => {
     cy.visit('/');
-    
-    // Captura inicial de la página
-    cy.screenshot('05-producto-inicio');
-    
-    // Esperar a que la página cargue completamente
-    cy.get('body', { timeout: 10000 }).should('be.visible');
-    
-    // Buscar campos de formulario
-    cy.get('input, textarea, button', { timeout: 5000 }).each(($el, index) => {
-      // Procesar elementos del formulario (4 campos: nombre, descripción, precio, stock)
-      if ($el.is('input') && index < 4) {
-        cy.wrap($el).then(($input) => {
-          if (!$input.attr('disabled')) {
-            if (index === 0) {
-              cy.wrap($input).type('Laptop Dell XPS 13', { delay: 50 });
-            } else if (index === 1) {
-              cy.wrap($input).type('Laptop de alto rendimiento', { delay: 50 });
-            } else if (index === 2) {
-              cy.wrap($input).type('1299.99', { delay: 50 });
-            } else if (index === 3) {
-              cy.wrap($input).type('15', { delay: 50 });
-            }
-          }
-        });
-      }
-    });
-    
-    // Captura del formulario después de llenar
-    cy.wait(500);
-    cy.screenshot('05-producto-formulario-lleno');
-    
-// Buscar botón de envío
-cy.get('button[type="submit"]', { timeout: 3000 }).then(($btn) => {
-  if ($btn.length > 0 && !$btn.attr('disabled')) {
-    // $btn[0] toma el primer botón exacto de la lista de elementos encontrados
-    cy.wrap($btn[0]).click({ force: true });
-    cy.screenshot('05-producto-enviado');
-  } else {
-    cy.screenshot('05-producto-formulario-listo');
-  }
-});
-    
-    // Validación final
-    cy.get('body').should('be.visible');
-    cy.screenshot('05-producto-registro-completado');
+
+    cy.contains('h1', 'Registro de Productos').should('be.visible');
+    cy.get('input[placeholder="Ingrese código"]').type('SKU-0001');
+    cy.get('input[placeholder="Ingrese nombre"]').type('Laptop Dell XPS');
+    cy.get('input[placeholder="Ingrese descripción"]').type('Equipo de alto rendimiento');
+    cy.get('input[placeholder="Stock"]').type('15');
+    cy.get('#fruit-select').select('Ropa').should('have.value', 'Ropa');
+    cy.screenshot('05-producto-formulario-completo');
+
+    cy.get('form button[type="submit"]').should('be.enabled').click();
+    cy.contains('Gracias por registrar la información del producto:').should('be.visible');
+    cy.contains('li', 'Código').should('contain', 'SKU-0001');
+    cy.contains('li', 'Nombre de producto').should('contain', 'Laptop Dell XPS');
+    cy.contains('li', 'Descripción').should('contain', 'Equipo de alto rendimiento');
+    cy.contains('li', 'Stock').should('contain', '15');
+    cy.contains('li', 'Categoría').should('contain', 'Ropa');
+    cy.screenshot('05-producto-registrado');
   });
 
-  it('Debe capturar pantalla de validación del formulario', () => {
-    // Visitar la página
+  it('debe validar los campos y exigir una categoría antes del registro', () => {
     cy.visit('/');
-    
-    // Captura inicial de validación
-    cy.screenshot('06-validacion-inicio');
-    
-    // Esperar a que la página cargue
-    cy.get('body', { timeout: 10000 }).should('be.visible');
-    
-    // Captura antes de cualquier acción
-    cy.screenshot('06-validacion-antes-envio');
-    
-    // Buscar botón de envío
-cy.get('form button[type="submit"]', { timeout: 3000 }).then(($btn) => {
-  if ($btn.length > 0) {
-    cy.wrap($btn).click({ force: true });
-    cy.screenshot('06-validacion-errores');
-  }
-});
-    
-    // Captura final
-    cy.get('body').should('be.visible');
-    cy.screenshot('06-validacion-completada');
+
+    cy.contains('h1', 'Registro de Productos').should('be.visible');
+    cy.contains('Por favor ingrese todo los datos solicitados.').should('be.visible');
+    cy.get('form button[type="submit"]').should('be.disabled');
+    cy.get('input[placeholder="Ingrese código"]')
+      .should('have.attr', 'minlength', '5')
+      .type('A')
+    cy.get('input[placeholder="Ingrese nombre"]').type('Mouse');
+    cy.get('input[placeholder="Ingrese descripción"]').type('Mouse inalámbrico');
+    cy.get('input[placeholder="Stock"]').type('5');
+
+    cy.get('form button[type="submit"]').should('be.disabled');
+    cy.get('input[placeholder="Ingrese código"]').clear().type('SKU-0002');
+    cy.get('form button[type="submit"]').should('be.enabled');
+    cy.get('#fruit-select').should('have.value', 'Select');
+    cy.screenshot('06-formulario-datos-sin-categoria');
+
+    cy.on('window:alert', (message) => {
+      expect(message).to.equal('Por favor seleccione la Categoría');
+    });
+    cy.get('form button[type="submit"]').click();
+    cy.contains('Gracias por registrar la información del producto:').should('not.exist');
+    cy.screenshot('06-validacion-categoria');
   });
 });

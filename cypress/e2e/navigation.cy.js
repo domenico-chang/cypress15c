@@ -1,42 +1,30 @@
-describe('Prueba 2: Pruebas de navegación y UI', () => {
-  it('Debe verificar elementos de navegación en la página', () => {
-    // Visitar la página
+describe('Navegación y responsividad de la aplicación', () => {
+  it('debe presentar el formulario React en el viewport de escritorio', () => {
+    cy.viewport(1280, 720);
     cy.visit('/');
-    
-    // Esperar a que la página cargue completamente
-    cy.get('body', { timeout: 10000 }).should('be.visible');
-    
-    // Tomar captura de pantalla de la navegación
-    cy.screenshot('03-navegacion-elementos');
-    
-    // Verificar que hay contenido en la página
-    cy.get('html').should('not.be.empty');
-    
-    // Captura final de navegación validada
-    cy.screenshot('03-navegacion-validada');
+
+    cy.contains('h1', 'Registro de Productos').should('be.visible');
+    cy.get('form').should('be.visible');
+    cy.get('input[placeholder="Ingrese código"]').should('be.visible');
+    cy.get('input[placeholder="Ingrese nombre"]').should('be.visible');
+    cy.get('input[placeholder="Ingrese descripción"]').should('be.visible');
+    cy.get('input[placeholder="Stock"]').should('be.visible');
+    cy.get('#fruit-select').should('be.visible');
+    cy.screenshot('03-formulario-viewport-escritorio');
   });
 
-  it('Debe verificar que la página sea responsive', () => {
-    // Visitar la página con un viewport específico
-    cy.visit('/', {
-      onBeforeLoad: (win) => {
-        win.resizeTo(1280, 720);
-      }
-    });
-    
-    // Captura del viewport 1280x720
-    cy.screenshot('04-responsive-1280x720');
-    
-    // Verificar que el contenido sea visible
-    cy.get('body').should('be.visible');
-    
-    // Verificar dimensiones de la ventana
-    cy.window().then((win) => {
-      expect(win.innerWidth).to.be.greaterThan(0);
-      expect(win.innerHeight).to.be.greaterThan(0);
-    });
-    
-    // Captura final de responsividad
-    cy.screenshot('04-responsive-validada');
+  it('debe mantener el formulario visible en un viewport móvil', () => {
+    cy.viewport(375, 667);
+    cy.visit('/');
+
+    cy.contains('h1', 'Registro de Productos').should('be.visible');
+    cy.get('form').should('be.visible');
+    cy.get('input[placeholder="Ingrese código"]').should('be.visible');
+    cy.get('input[placeholder="Ingrese nombre"]').should('be.visible');
+    cy.get('input[placeholder="Ingrese descripción"]').should('be.visible');
+    cy.get('input[placeholder="Stock"]').should('be.visible');
+    cy.get('#fruit-select').should('be.visible');
+    cy.window().its('innerWidth').should('eq', 375);
+    cy.screenshot('04-formulario-viewport-movil');
   });
 });

@@ -1,32 +1,24 @@
-describe('Prueba 1: Verificar página de inicio', () => {
-  it('Debe cargar la página y verificar que no esté vacía', () => {
-    // Visitar la página
+describe('Aplicación React de registro de productos', () => {
+  it('debe mostrar la aplicación React y el encabezado del formulario', () => {
     cy.visit('/');
-    
-    // Tomar captura de pantalla inicial
-    cy.screenshot('01-pagina-inicio-cargada');
-    
-    // Verificar que la página se haya cargado
-    cy.get('body').should('be.visible');
-    
-    // Verificar que el documento tenga contenido
-    cy.document().should('have.property', 'contentType');
-    
-    // Tomar captura de pantalla después de validación
-    cy.screenshot('01-pagina-inicio-validada');
+
+    cy.title().should('eq', 'Registro de Productos');
+    cy.contains('h1', 'Registro de Productos').should('be.visible');
+    cy.location('href').should('not.include', 'vercel.com/login');
+    cy.get('form').should('be.visible');
+    cy.screenshot('01-aplicacion-react-cargada');
   });
 
-  it('Debe tener un título válido en la página', () => {
-    // Visitar la página
+  it('debe mostrar los campos reales del formulario de producto', () => {
     cy.visit('/');
-    
-    // Tomar captura de pantalla antes de verificar título
-    cy.screenshot('02-titulo-verificacion');
-    
-    // Verificar que exista un title
-    cy.title().should('not.be.empty');
-    
-    // Tomar captura de pantalla final
-    cy.screenshot('02-titulo-validado');
+
+    cy.contains('h1', 'Registro de Productos').should('be.visible');
+    cy.get('input[placeholder="Ingrese código"]').should('be.visible');
+    cy.get('input[placeholder="Ingrese nombre"]').should('be.visible');
+    cy.get('input[placeholder="Ingrese descripción"]').should('be.visible');
+    cy.get('input[placeholder="Stock"]').should('be.visible');
+    cy.get('#fruit-select').should('be.visible');
+    cy.get('form button[type="submit"]').should('be.disabled');
+    cy.screenshot('02-formulario-producto-visible');
   });
 });
